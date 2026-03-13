@@ -1,0 +1,94 @@
+import { useState, useEffect, useRef } from "react";
+import Blog from "./components/Blog";
+import blogService from "./services/blogs";
+import LoginForm from "./components/LoginForm";
+import loginService from "./services/login";
+import BlogForm from "./components/BlogForm";
+import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
+
+const App = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [user, setUser] = useState(null);
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null,
+  });
+
+  const blogFormRef = useRef();
+
+  useEffect(() => {
+    blogService.getAll().then((blogs) => setBlogs(blogs));
+  }, []);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+    }
+  }, []);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification({ message: null, type: null });
+    }, 5000);
+  };
+
+  const handleLogin = async (userObject) => {
+    try {
+      const user = await loginService.login(userObject);
+
+      blogService.setToken(user.token);
+      window.localStorage.setItem("loggedBloglistUser", JSON.stringify(user));
+      setUser(user);
+      showNotification("Loggeado correctamente");
+    } catch {
+      showNotification("wrong username or password", "error");
+    }
+  };
+
+  const handleLogout = () => {
+    window.localStorage.removeItem("loggedBloglistUser");
+    setUser(null);
+  };
+
+  const addBlog = async (blogObject) => {
+    try {
+      const returnedBlog = await blogService.create(blogObject);
+      setBlogs(blogs.concat(returnedBlog));
+      showNotification(
+        `a new blog '${returnedBlog.title}' by ${returnedBlog.author} added`,
+      );
+      blogFormRef.current.toggleVisibility();
+    } catch (error) {
+      const errorMsg = error.response?.data?.error || "Error creating blog";
+      showNotification(errorMsg, "error");
+    }
+  };
+
+  return (
+    <div>
+      <Notification message={notification.message} type={notification.type} />
+      {user === null ? (
+        <LoginForm loginUser={handleLogin} />
+      ) : (
+        <div>
+          <h2>blogs</h2>
+          <span>{user.name} logged in</span>
+          <button onClick={handleLogout}>logout</button>
+          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+            <BlogForm createBlog={addBlog} />
+          </Togglable>
+          {blogs.map((blog) => (
+            <Blog key={blog.id} blog={blog} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;
