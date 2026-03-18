@@ -125,6 +125,17 @@ const App = () => {
               onDelete={() => handleDelete(blog)}
             />
           ))}
+          <ul>
+            {blogs.map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                onLike={() => handleLike(blog)}
+                canDelete={blog.user.id === user.id}
+                onDelete={() => handleDelete(blog)}
+              />
+            ))}
+          </ul>
         </div>
       )}
     </div>
