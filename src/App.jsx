@@ -12,7 +12,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState({
     message: null,
-    type: null,
+    type: null
   })
 
   const blogFormRef = useRef()
@@ -60,7 +60,7 @@ const App = () => {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
       showNotification(
-        `a new blog '${returnedBlog.title}' by ${returnedBlog.author} added`,
+        `a new blog '${returnedBlog.title}' by ${returnedBlog.author} added`
       )
       blogFormRef.current.toggleVisibility()
     } catch (error) {
@@ -73,14 +73,14 @@ const App = () => {
     const blogToUpdate = {
       ...blog,
       likes: blog.likes + 1,
-      user: blog.user.id,
+      user: blog.user.id
     }
 
     try {
       const returnedBlog = await blogService.update(blog.id, blogToUpdate)
       const updatedBlogs = blogs
         .map((b) =>
-          b.id !== blog.id ? b : { ...returnedBlog, user: blog.user },
+          b.id !== blog.id ? b : { ...returnedBlog, user: blog.user }
         )
         .sort((a, b) => b.likes - a.likes)
       setBlogs(updatedBlogs)
@@ -116,15 +116,6 @@ const App = () => {
           <Togglable buttonLabel="create new blog" ref={blogFormRef}>
             <BlogForm createBlog={addBlog} />
           </Togglable>
-          {blogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              onLike={() => handleLike(blog)}
-              canDelete={blog.user.id === user.id}
-              onDelete={() => handleDelete(blog)}
-            />
-          ))}
           <ul>
             {blogs.map((blog) => (
               <Blog

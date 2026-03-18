@@ -3,16 +3,7 @@ import { useState } from 'react'
 const Blog = ({ blog, onLike, canDelete, onDelete }) => {
   const [visible, setVisible] = useState(false)
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   return (
-    <div style={blogStyle}>
     <li className="blog">
       {blog.title} {blog.author}{' '}
       <button onClick={() => setVisible(!visible)}>
@@ -33,7 +24,7 @@ const Blog = ({ blog, onLike, canDelete, onDelete }) => {
                   backgroundColor: '#009aff',
                   border: 'none',
                   borderRadius: 5,
-                  padding: '4px 10px',
+                  padding: '4px 10px'
                 }}
                 onClick={onDelete}
               >
@@ -43,7 +34,6 @@ const Blog = ({ blog, onLike, canDelete, onDelete }) => {
           )}
         </div>
       )}
-    </div>
     </li>
   )
 }
